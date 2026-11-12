@@ -829,5 +829,11 @@
   "servers.card.connection_details": "Dettagli della connessione",
   "servers.health.state.connection_blocked": "Connessione bloccata",
   "operations.elapsed_seconds": "Tempo trascorso: {seconds} s",
-  "operations.elapsed_minutes": "Tempo trascorso: {minutes} min {seconds} s"
+  "operations.elapsed_minutes": "Tempo trascorso: {minutes} min {seconds} s",
+  "servers.form.jail_tags": "Tag dei jail",
+  "servers.form.jail_tags_placeholder": "sshd: tag1, tag2",
+  "servers.actions.sync": "Sincronizza i jail con tag",
+  "servers.confirm.sync": "Copiare i jail, i filtri e i ban IP con tag di questo server sugli altri server con gli stessi tag? I loro ban non presenti su questo server verranno rimossi.",
+  "servers.toast.sync_failed": "Sincronizzazione dei jail con tag non riuscita",
+  "servers.toast.sync_queued": "Sincronizzazione in coda; le modifiche appaiono come operazioni"
 }

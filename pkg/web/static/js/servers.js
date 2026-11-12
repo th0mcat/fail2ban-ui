@@ -407,9 +407,11 @@ function renderServerManagerList() {
       descriptor.push(server.hostname);
     }
     var meta = descriptor.join(' - ');
+    var jailTagText = formatJailTags(server.jailTags).split('\n').filter(Boolean).join(' | ');
     var tags = (server.tags || []).length
       ? '<div class="mt-2 text-xs text-gray-500 break-words">' + escapeHtml(server.tags.join(', ')) + '</div>'
       : '';
+    if (jailTagText) tags += '<div class="mt-1 text-xs text-gray-500 break-words">' + escapeHtml(jailTagText) + '</div>';
     var localDetails = '';
     if ((server.type || '').toLowerCase() === 'local') {
       var socketPath = server.socketPath || '/var/run/fail2ban/fail2ban.sock';
@@ -453,6 +455,9 @@ function renderServerManagerList() {
       + (server.hostKeyError && server.hostKeyFingerprint
         ? '<button class="text-sm font-semibold text-red-600 hover:text-red-800" onclick="acceptHostKey(\'' + escapeHtml(server.id) + '\')" data-i18n="servers.actions.accept_hostkey">Accept new host key</button>'
         : '')
+      + (server.enabled && jailTagText
+        ? '<button class="text-sm text-blue-600 hover:text-blue-800" onclick="syncTaggedJails(\'' + escapeHtml(server.id) + '\')" data-i18n="servers.actions.sync">Sync tagged jails</button>'
+        : '')
       + '      <button class="text-sm text-blue-600 hover:text-blue-800" onclick="testServerConnection(\'' + escapeHtml(server.id) + '\')" data-i18n="servers.actions.test">Test connection</button>'
       + '    </div>'
       + '  </div>'
@@ -463,6 +468,58 @@ function renderServerManagerList() {
   list.innerHTML = html;
   positionServerManagerEditor(editorFocus, editorScroll);
   updateTranslations();
+}
+
+// One "jail: tag1, tag2" line per jail.
+function parseJailTags(text) {
+  var result = {};
+  String(text || '').split('\n').forEach(function(line) {
+    var idx = line.indexOf(':');
+    if (idx < 0) return;
+    var jail = line.slice(0, idx).trim();
+    var tags = line.slice(idx + 1).split(',').map(function(tag) { return tag.trim(); }).filter(Boolean);
+    if (jail && tags.length) result[jail] = (result[jail] || []).concat(tags);
+  });
+  return result;
+}
+
+function formatJailTags(jailTags) {
+  return Object.keys(jailTags || {}).sort().map(function(jail) {
+    return jail + ': ' + jailTags[jail].join(', ');
+  }).join('\n');
+}
+
+// Syncs every tag the server's jails carry from this server to the other servers with that tag.
+function syncTaggedJails(serverId) {
+  var server = serversCache.find(function(s) { return s.id === serverId; });
+  if (!server) return;
+  var tags = [];
+  Object.keys(server.jailTags || {}).forEach(function(jail) {
+    server.jailTags[jail].forEach(function(tag) { if (tags.indexOf(tag) < 0) tags.push(tag); });
+  });
+  if (!tags.length) return;
+  if (!confirm(t('servers.confirm.sync', 'Copy the tagged jails, filters and IP bans of this server to the other servers with the same tags? Their bans that are not on this server are removed.'))) return;
+  fetch(appPath('/api/sync'), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ tags: tags })
+  })
+    .then(readJsonResponse)
+    .then(function(data) {
+      if (data.error) {
+        showToast(formatApiError(data, 'servers.toast.sync_failed', 'Failed to sync tagged jails'), 'error');
+        return;
+      }
+      var failed = (data.groups || []).filter(function(group) {
+        return group.error || (group.targets || []).some(function(target) { return target.error; });
+      });
+      showToast(failed.length
+        ? t('servers.toast.sync_failed', 'Failed to sync tagged jails') + ': ' + failed.map(function(group) { return group.tag; }).join(', ')
+        : t('servers.toast.sync_queued', 'Sync queued; changes appear as operations'), failed.length ? 'error' : 'success');
+    })
+    .catch(function(err) {
+      showToast(t('servers.toast.sync_failed', 'Failed to sync tagged jails') + ': ' + err.message, 'error');
+    });
 }
 
 var serverEditorRevision = 0;
@@ -582,6 +639,7 @@ function resetServerForm() {
   document.getElementById('serverAgentUrl').value = '';
   document.getElementById('serverAgentSecret').value = '';
   document.getElementById('serverTags').value = '';
+  document.getElementById('serverJailTags').value = '';
   document.getElementById('serverDefault').checked = false;
   document.getElementById('serverEnabled').checked = false;
   document.getElementById('serverReverseTunnel').checked = false;
@@ -609,6 +667,7 @@ function editServer(serverId) {
   document.getElementById('serverAgentUrl').value = server.agentUrl || '';
   document.getElementById('serverAgentSecret').value = server.agentSecret || '';
   document.getElementById('serverTags').value = (server.tags || []).join(',');
+  document.getElementById('serverJailTags').value = formatJailTags(server.jailTags);
   document.getElementById('serverDefault').checked = !!server.isDefault;
   document.getElementById('serverEnabled').checked = !!server.enabled;
   document.getElementById('serverReverseTunnel').checked = !!server.reverseTunnelEnabled;
@@ -739,6 +798,7 @@ function submitServerForm(event) {
     tags: document.getElementById('serverTags').value
       ? document.getElementById('serverTags').value.split(',').map(function(tag) { return tag.trim(); }).filter(Boolean)
       : [],
+    jailTags: parseJailTags(document.getElementById('serverJailTags').value),
     enabled: document.getElementById('serverEnabled').checked,
     reverseTunnelEnabled: document.getElementById('serverReverseTunnel').checked,
     tunnelPort: document.getElementById('serverTunnelPort').value ? parseInt(document.getElementById('serverTunnelPort').value, 10) : 0

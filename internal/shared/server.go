@@ -24,29 +24,31 @@ import (
 // Describes a registered Fail2ban instance and how to reach it.
 // It lives in package shared so connector code does not import application config.
 type Fail2banServer struct {
-	ID                   string    `json:"id"`
-	Name                 string    `json:"name"`
-	Type                 string    `json:"type"`
-	Host                 string    `json:"host,omitempty"`
-	Port                 int       `json:"port,omitempty"`
-	SocketPath           string    `json:"socketPath,omitempty"`
-	ConfigPath           string    `json:"configPath,omitempty"`
-	SSHUser              string    `json:"sshUser,omitempty"`
-	SSHKeyPath           string    `json:"sshKeyPath,omitempty"`
-	AgentURL             string    `json:"agentUrl,omitempty"`
-	AgentSecret          string    `json:"agentSecret,omitempty"`
-	Hostname             string    `json:"hostname,omitempty"`
-	Tags                 []string  `json:"tags,omitempty"`
-	IsDefault            bool      `json:"isDefault"`
-	Enabled              bool      `json:"enabled"`
-	ReverseTunnelEnabled bool      `json:"reverseTunnelEnabled,omitempty"`
-	TunnelPort           int       `json:"tunnelPort,omitempty"`
-	CreatedAt            time.Time `json:"createdAt"`
-	UpdatedAt            time.Time `json:"updatedAt"`
-	EnabledSet           bool      `json:"-"`
-	DisabledReason       string    `json:"disabledReason,omitempty"`
-	HostKeyError         string    `json:"hostKeyError,omitempty"`
-	HostKeyFingerprint   string    `json:"hostKeyFingerprint,omitempty"`
+	ID          string   `json:"id"`
+	Name        string   `json:"name"`
+	Type        string   `json:"type"`
+	Host        string   `json:"host,omitempty"`
+	Port        int      `json:"port,omitempty"`
+	SocketPath  string   `json:"socketPath,omitempty"`
+	ConfigPath  string   `json:"configPath,omitempty"`
+	SSHUser     string   `json:"sshUser,omitempty"`
+	SSHKeyPath  string   `json:"sshKeyPath,omitempty"`
+	AgentURL    string   `json:"agentUrl,omitempty"`
+	AgentSecret string   `json:"agentSecret,omitempty"`
+	Hostname    string   `json:"hostname,omitempty"`
+	Tags        []string `json:"tags,omitempty"`
+	// Jail name -> tags. A tag shared by a server and one of its jails makes that jail the sync source for every other server with the tag.
+	JailTags             map[string][]string `json:"jailTags,omitempty"`
+	IsDefault            bool                `json:"isDefault"`
+	Enabled              bool                `json:"enabled"`
+	ReverseTunnelEnabled bool                `json:"reverseTunnelEnabled,omitempty"`
+	TunnelPort           int                 `json:"tunnelPort,omitempty"`
+	CreatedAt            time.Time           `json:"createdAt"`
+	UpdatedAt            time.Time           `json:"updatedAt"`
+	EnabledSet           bool                `json:"-"`
+	DisabledReason       string              `json:"disabledReason,omitempty"`
+	HostKeyError         string              `json:"hostKeyError,omitempty"`
+	HostKeyFingerprint   string              `json:"hostKeyFingerprint,omitempty"`
 }
 
 // Distinguishes explicit false for "enabled" from a missing key.
