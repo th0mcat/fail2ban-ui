@@ -526,6 +526,10 @@ func applyServerRecordsLocked(records []storage.ServerRecord) {
 		if rec.TagsJSON != "" {
 			_ = json.Unmarshal([]byte(rec.TagsJSON), &tags)
 		}
+		var jailTags map[string][]string
+		if rec.JailTagsJSON != "" {
+			_ = json.Unmarshal([]byte(rec.JailTagsJSON), &jailTags)
+		}
 		server := Fail2banServer{
 			ID:                   rec.ID,
 			Name:                 rec.Name,
@@ -540,6 +544,7 @@ func applyServerRecordsLocked(records []storage.ServerRecord) {
 			AgentSecret:          rec.AgentSecret,
 			Hostname:             rec.Hostname,
 			Tags:                 tags,
+			JailTags:             jailTags,
 			IsDefault:            rec.IsDefault,
 			Enabled:              rec.Enabled,
 			ReverseTunnelEnabled: rec.ReverseTunnelEnabled,
@@ -642,6 +647,14 @@ func toServerRecordsLocked() ([]storage.ServerRecord, error) {
 		if err != nil {
 			return nil, err
 		}
+		jailTags := srv.JailTags
+		if jailTags == nil {
+			jailTags = map[string][]string{}
+		}
+		jailTagBytes, err := json.Marshal(jailTags)
+		if err != nil {
+			return nil, err
+		}
 		createdAt := srv.CreatedAt
 		if createdAt.IsZero() {
 			createdAt = time.Now().UTC()
@@ -664,6 +677,7 @@ func toServerRecordsLocked() ([]storage.ServerRecord, error) {
 			AgentSecret:          srv.AgentSecret,
 			Hostname:             srv.Hostname,
 			TagsJSON:             string(tagBytes),
+			JailTagsJSON:         string(jailTagBytes),
 			IsDefault:            srv.IsDefault,
 			Enabled:              srv.Enabled,
 			ReverseTunnelEnabled: srv.ReverseTunnelEnabled,
@@ -1081,6 +1095,12 @@ func cloneServer(src Fail2banServer) Fail2banServer {
 	if src.Tags != nil {
 		dst.Tags = append([]string{}, src.Tags...)
 	}
+	if src.JailTags != nil {
+		dst.JailTags = make(map[string][]string, len(src.JailTags))
+		for jail, tags := range src.JailTags {
+			dst.JailTags[jail] = append([]string{}, tags...)
+		}
+	}
 	dst.EnabledSet = src.EnabledSet
 	return dst
 }
@@ -1217,6 +1237,8 @@ func UpsertServer(input Fail2banServer) (Fail2banServer, error) {
 	input.Host = strings.TrimSpace(input.Host)
 	input.SSHUser = strings.TrimSpace(input.SSHUser)
 	input.SSHKeyPath = normalizePathValue(input.SSHKeyPath)
+	input.Tags = shared.NormalizeTags(input.Tags)
+	input.JailTags = shared.NormalizeJailTags(input.JailTags)
 	input.DisabledReason = ""
 	input.HostKeyError = ""
 	input.HostKeyFingerprint = ""

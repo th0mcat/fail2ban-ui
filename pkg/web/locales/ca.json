@@ -829,5 +829,11 @@
   "servers.card.connection_details": "Detalls de la connexió",
   "servers.health.state.connection_blocked": "Connexió bloquejada",
   "operations.elapsed_seconds": "Temps transcorregut: {seconds} s",
-  "operations.elapsed_minutes": "Temps transcorregut: {minutes} min {seconds} s"
+  "operations.elapsed_minutes": "Temps transcorregut: {minutes} min {seconds} s",
+  "servers.form.jail_tags": "Etiquetes de jails",
+  "servers.form.jail_tags_placeholder": "sshd: etiqueta1, etiqueta2",
+  "servers.actions.sync": "Sincronitza els jails etiquetats",
+  "servers.confirm.sync": "Voleu copiar els jails, filtres i bloquejos d'IP etiquetats d'aquest servidor als altres servidors amb les mateixes etiquetes? Se n'eliminaran els bloquejos que no són en aquest servidor.",
+  "servers.toast.sync_failed": "No s'han pogut sincronitzar els jails etiquetats",
+  "servers.toast.sync_queued": "Sincronització en cua; els canvis apareixen com a operacions"
 }

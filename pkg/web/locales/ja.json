@@ -829,5 +829,11 @@
   "servers.card.connection_details": "接続の詳細",
   "servers.health.state.connection_blocked": "接続がブロックされました",
   "operations.elapsed_seconds": "経過: {seconds}秒",
-  "operations.elapsed_minutes": "経過: {minutes}分{seconds}秒"
+  "operations.elapsed_minutes": "経過: {minutes}分{seconds}秒",
+  "servers.form.jail_tags": "Jailタグ",
+  "servers.form.jail_tags_placeholder": "sshd: tag1, tag2",
+  "servers.actions.sync": "タグ付きJailを同期",
+  "servers.confirm.sync": "このサーバーのタグ付きJail、フィルター、IPバンを同じタグを持つ他のサーバーにコピーしますか？このサーバーにないバンは他のサーバーから削除されます。",
+  "servers.toast.sync_failed": "タグ付きJailの同期に失敗しました",
+  "servers.toast.sync_queued": "同期をキューに追加しました。変更は操作として表示されます"
 }

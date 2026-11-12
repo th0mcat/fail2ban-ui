@@ -829,5 +829,11 @@
   "servers.card.connection_details": "连接详情",
   "servers.health.state.connection_blocked": "连接已被阻止",
   "operations.elapsed_seconds": "已用时：{seconds}秒",
-  "operations.elapsed_minutes": "已用时：{minutes}分{seconds}秒"
+  "operations.elapsed_minutes": "已用时：{minutes}分{seconds}秒",
+  "servers.form.jail_tags": "Jail 标签",
+  "servers.form.jail_tags_placeholder": "sshd: tag1, tag2",
+  "servers.actions.sync": "同步带标签的 Jail",
+  "servers.confirm.sync": "将此服务器上带标签的 Jail、过滤器和 IP 封禁复制到具有相同标签的其他服务器？其他服务器上不在此服务器中的封禁将被移除。",
+  "servers.toast.sync_failed": "同步带标签的 Jail 失败",
+  "servers.toast.sync_queued": "同步已排队；更改将显示为操作"
 }

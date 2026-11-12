@@ -829,5 +829,11 @@
   "servers.card.connection_details": "Détails de la connexion",
   "servers.health.state.connection_blocked": "Connexion bloquée",
   "operations.elapsed_seconds": "Durée écoulée : {seconds} s",
-  "operations.elapsed_minutes": "Durée écoulée : {minutes} min {seconds} s"
+  "operations.elapsed_minutes": "Durée écoulée : {minutes} min {seconds} s",
+  "servers.form.jail_tags": "Étiquettes de jails",
+  "servers.form.jail_tags_placeholder": "sshd: étiquette1, étiquette2",
+  "servers.actions.sync": "Synchroniser les jails étiquetés",
+  "servers.confirm.sync": "Copier les jails, filtres et bannissements d'IP étiquetés de ce serveur vers les autres serveurs portant les mêmes étiquettes ? Leurs bannissements absents de ce serveur seront supprimés.",
+  "servers.toast.sync_failed": "Échec de la synchronisation des jails étiquetés",
+  "servers.toast.sync_queued": "Synchronisation planifiée ; les changements apparaissent comme opérations"
 }

@@ -829,5 +829,11 @@
   "servers.card.connection_details": "Verbindungsdetails",
   "servers.health.state.connection_blocked": "Verbindung blockiert",
   "operations.elapsed_seconds": "Vergangen: {seconds} Sek.",
-  "operations.elapsed_minutes": "Vergangen: {minutes} Min. {seconds} Sek."
+  "operations.elapsed_minutes": "Vergangen: {minutes} Min. {seconds} Sek.",
+  "servers.form.jail_tags": "Jail-Tags",
+  "servers.form.jail_tags_placeholder": "sshd: tag1, tag2",
+  "servers.actions.sync": "Getaggte Jails synchronisieren",
+  "servers.confirm.sync": "Getaggte Jails, Filter und IP-Sperren dieses Servers auf die anderen Server mit denselben Tags kopieren? Deren Sperren, die auf diesem Server nicht vorhanden sind, werden entfernt.",
+  "servers.toast.sync_failed": "Synchronisieren der getaggten Jails fehlgeschlagen",
+  "servers.toast.sync_queued": "Synchronisierung eingereiht; Änderungen erscheinen als Vorgänge"
 }

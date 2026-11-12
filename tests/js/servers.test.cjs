@@ -328,7 +328,7 @@ function editorHarness(servers, mobile = false) {
   const form = formView.appendChild(new Element('serverForm'));
   for (const id of ['serverId', 'serverName', 'serverType', 'serverHost', 'serverPort', 'serverSocket',
     'serverConfigPath', 'serverHostname', 'serverSSHUser', 'serverSSHKey', 'serverSSHKeySelect',
-    'serverAgentUrl', 'serverAgentSecret', 'serverTags', 'serverDefault', 'serverEnabled',
+    'serverAgentUrl', 'serverAgentSecret', 'serverTags', 'serverJailTags', 'serverDefault', 'serverEnabled',
     'serverReverseTunnel', 'serverTunnelPort', 'serverConfigPathGroup', 'serverTunnelPortGroup', 'serverDeleteButton']) {
     form.appendChild(new Element(id));
   }
@@ -498,4 +498,11 @@ test('late SSH-key responses cannot overwrite another server, a reset form, or a
   requests[3]({ json: async () => ({ keys: ['/keys/b'] }) });
   await tick();
   assert.equal(populated.length, afterReset, 'a response cannot populate the reset/new form');
+});
+
+test('parseJailTags and formatJailTags round-trip one jail per line', () => {
+  const parsed = plain(context.parseJailTags('sshd: a, b\nnginx:c\n\nbad line\nsshd: d'));
+  assert.deepEqual(parsed, { sshd: ['a', 'b', 'd'], nginx: ['c'] });
+  assert.equal(context.formatJailTags({ sshd: ['a', 'b'], nginx: ['c'] }), 'nginx: c\nsshd: a, b');
+  assert.equal(context.formatJailTags(undefined), '');
 });

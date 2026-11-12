@@ -37,6 +37,7 @@ type jailConfigRequest struct {
 type jailCreateRequest struct {
 	JailName string `json:"jailName"`
 	Content  string `json:"content"`
+	Filter   string `json:"filter,omitempty"` // written as the jail's filter, for jails synced from another server
 }
 type filterCreateRequest struct {
 	FilterName string `json:"filterName"`
@@ -295,7 +296,14 @@ func (t *operationTransaction) write(ctx context.Context) error {
 		if strings.TrimSpace(req.Content) == "" {
 			req.Content = "enabled = false\n"
 		}
-		return t.conn.CreateJail(ctx, req.JailName, fail2ban.NormalizeJailSection(req.JailName, req.Content))
+		content := fail2ban.NormalizeJailSection(req.JailName, req.Content)
+		if err := t.conn.CreateJail(ctx, req.JailName, content); err != nil {
+			return err
+		}
+		if req.Filter != "" {
+			return t.conn.SetFilterConfig(ctx, fail2ban.FilterNameForJail(req.JailName, content), req.Filter)
+		}
+		return nil
 	case "jail.delete":
 		return t.conn.DeleteJail(ctx, t.payload.Jail)
 	case "filter.create":

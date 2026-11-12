@@ -829,5 +829,11 @@
   "servers.card.connection_details": "Detalles de la conexión",
   "servers.health.state.connection_blocked": "Conexión bloqueada",
   "operations.elapsed_seconds": "Tiempo transcurrido: {seconds} s",
-  "operations.elapsed_minutes": "Tiempo transcurrido: {minutes} min {seconds} s"
+  "operations.elapsed_minutes": "Tiempo transcurrido: {minutes} min {seconds} s",
+  "servers.form.jail_tags": "Etiquetas de jails",
+  "servers.form.jail_tags_placeholder": "sshd: etiqueta1, etiqueta2",
+  "servers.actions.sync": "Sincronizar jails etiquetados",
+  "servers.confirm.sync": "¿Copiar los jails, filtros y bloqueos de IP etiquetados de este servidor a los demás servidores con las mismas etiquetas? Se eliminarán sus bloqueos que no estén en este servidor.",
+  "servers.toast.sync_failed": "Error al sincronizar los jails etiquetados",
+  "servers.toast.sync_queued": "Sincronización en cola; los cambios aparecen como operaciones"
 }

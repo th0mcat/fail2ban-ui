@@ -131,6 +131,13 @@ func UpsertServerHandler(c *gin.Context) {
 		return
 	}
 
+	for jail := range req.JailTags {
+		if err := fail2ban.ValidateJailName(jail); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid jail tag entry: " + err.Error()})
+			return
+		}
+	}
+
 	manager := fail2ban.GetManager()
 	releaseConfig := manager.GuardServerConfiguration()
 	defer releaseConfig()

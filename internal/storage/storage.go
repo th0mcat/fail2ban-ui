@@ -233,6 +233,7 @@ type ServerRecord struct {
 	AgentSecret          string
 	Hostname             string
 	TagsJSON             string
+	JailTagsJSON         string
 	IsDefault            bool
 	Enabled              bool
 	ReverseTunnelEnabled bool
@@ -592,7 +593,7 @@ func ListServers(ctx context.Context) ([]ServerRecord, error) {
 	}
 
 	rows, err := db.QueryContext(ctx, `
-SELECT id, name, type, host, port, socket_path, config_path, ssh_user, ssh_key_path, agent_url, agent_secret, hostname, tags, is_default, enabled, reverse_tunnel, tunnel_port, created_at, updated_at
+SELECT id, name, type, host, port, socket_path, config_path, ssh_user, ssh_key_path, agent_url, agent_secret, hostname, tags, jail_tags, is_default, enabled, reverse_tunnel, tunnel_port, created_at, updated_at
 FROM servers
 ORDER BY created_at`)
 	if err != nil {
@@ -603,7 +604,7 @@ ORDER BY created_at`)
 	var records []ServerRecord
 	for rows.Next() {
 		var rec ServerRecord
-		var host, socket, configPath, sshUser, sshKey, agentURL, agentSecret, hostname, tags sql.NullString
+		var host, socket, configPath, sshUser, sshKey, agentURL, agentSecret, hostname, tags, jailTags sql.NullString
 		var name, serverType sql.NullString
 		var created, updated sql.NullString
 		var port, tunnelPort sql.NullInt64
@@ -623,6 +624,7 @@ ORDER BY created_at`)
 			&agentSecret,
 			&hostname,
 			&tags,
+			&jailTags,
 			&isDefault,
 			&enabled,
 			&reverseTunnel,
@@ -645,6 +647,7 @@ ORDER BY created_at`)
 		rec.AgentSecret = stringFromNull(agentSecret)
 		rec.Hostname = stringFromNull(hostname)
 		rec.TagsJSON = stringFromNull(tags)
+		rec.JailTagsJSON = stringFromNull(jailTags)
 		rec.IsDefault = intToBool(intFromNull(isDefault))
 		rec.Enabled = intToBool(intFromNull(enabled))
 		rec.ReverseTunnelEnabled = intToBool(intFromNull(reverseTunnel))
@@ -688,9 +691,9 @@ func ReplaceServers(ctx context.Context, servers []ServerRecord) error {
 
 	stmt, err := tx.PrepareContext(ctx, `
 INSERT INTO servers (
-	id, name, type, host, port, socket_path, config_path, ssh_user, ssh_key_path, agent_url, agent_secret, hostname, tags, is_default, enabled, reverse_tunnel, tunnel_port, created_at, updated_at
+	id, name, type, host, port, socket_path, config_path, ssh_user, ssh_key_path, agent_url, agent_secret, hostname, tags, jail_tags, is_default, enabled, reverse_tunnel, tunnel_port, created_at, updated_at
 ) VALUES (
-	?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+	?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
 )`)
 	if err != nil {
 		return err
@@ -720,6 +723,7 @@ INSERT INTO servers (
 			srv.AgentSecret,
 			srv.Hostname,
 			srv.TagsJSON,
+			srv.JailTagsJSON,
 			boolToInt(srv.IsDefault),
 			boolToInt(srv.Enabled),
 			boolToInt(srv.ReverseTunnelEnabled),
@@ -1624,6 +1628,7 @@ var schemaTables = []tableDef{
 			col("agent_secret", "TEXT"),
 			col("hostname", "TEXT"),
 			col("tags", "TEXT"),
+			col("jail_tags", "TEXT"),
 			col("is_default", "INTEGER"),
 			col("enabled", "INTEGER"),
 			col("reverse_tunnel", "INTEGER DEFAULT 0"),

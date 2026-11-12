@@ -29,6 +29,7 @@ Every endpoint that accepts an IP address validates it server-side with Go's `ne
 | `DELETE /api/servers/:id` | Delete a server |
 | `POST /api/servers/:id/default` | Set a server as the default |
 | `POST /api/servers/:id/test` | Test server connectivity without changing anything on the host |
+| `POST /api/sync` | Sync tagged jails across servers. A tag shared by a server and one of its jails (`jailTags` on the server, tags in `tags`) makes that server the source; every other server with the tag is a target. Body (all optional, default all): `{"tags": ["<tag>"], "jails": true, "filters": true, "bans": true, "unbans": true}`. Each change is queued as a normal operation per target; the `202` response lists the operation IDs per tag and target. Missing jails are created and differing jails/filters are overwritten, nothing is deleted. Bans and unbans mirror the source jail (IPs banned on the target but not on the source are unbanned), at most 1000 per target and request. Bans for a jail created in this request are reported as `pendingBans`; run the sync again once the jail is active. Exactly one source per tag is allowed |
 | `GET /api/ssh/keys` | List available SSH keys |
 
 Each enabled server in `GET /api/servers` carries its state so the UI can flag a host that stopped protecting you, without waiting for a user to notice missing bans:
